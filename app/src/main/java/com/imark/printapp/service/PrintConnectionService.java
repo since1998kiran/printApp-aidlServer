@@ -15,7 +15,7 @@ import com.imark.tmscall.IPrinterService;
 public class PrintConnectionService implements ServiceConnection {
     private static final String INTENT_ACTION = "com.imark.tmscall.PrinterService";
     private static final String PACKAGE_NAME = "com.imark.tmscall";
-    private static final String TAG = "ServiceCallHelper";
+    private static final String TAG = "PrintConnectionService";
     private static volatile PrintConnectionService instance;
 
     private int retry = 0;
@@ -52,7 +52,7 @@ public class PrintConnectionService implements ServiceConnection {
     public void onServiceDisconnected(ComponentName componentName) {
         isServiceConnected = false;
         iPrinterService = null;
-        Log.d(TAG,"TMS Call service disconnected");
+        Log.d(TAG, "TMS Call service disconnected");
     }
 
     public void bindService() {
@@ -76,10 +76,15 @@ public class PrintConnectionService implements ServiceConnection {
             bindService();
             return false;
         }
+
         try {
-            return iPrinterService.startPrinting(base64Image);
+            boolean isSuccess = iPrinterService.startPrinting(base64Image);
+            Log.d(TAG, "startPrinting returned: " + isSuccess);
+            return isSuccess;
         } catch (RemoteException e) {
+            Log.e(TAG, "Printing failed due to RemoteException: " + e.getMessage());
             return false;
         }
     }
+
 }

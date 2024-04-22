@@ -33,22 +33,28 @@ public class MainActivity extends AppCompatActivity {
             printCall();
         });
     }
-
     private void printCall() {
         CreateBitmap createBitmap = new CreateBitmap();
         Bitmap bitmap = createBitmap.getBitmap();
         String base64Image = convertBitmapToBase64(bitmap);
+
         try {
             PrintConnectionService service = PrintConnectionService.myInstance();
             if (service == null || !PrintConnectionService.isServiceConnected) {
                 ViewUtils.alertDialog(this, "PrintApp", "Service Bind Failed, Please assure Server Service is Running or Not!");
             } else {
-                PrintConnectionService.myInstance().print(base64Image);
+                boolean isSuccess = service.print(base64Image); // Call the print method from PrintConnectionService
+                if (isSuccess) {
+                    ViewUtils.alertDialog(MainActivity.this, "status", "Print Success");
+                } else {
+                    ViewUtils.alertDialog(MainActivity.this, "status", "Print Failed");
+                }
             }
         } catch (RemoteException e) {
             throw new RuntimeException(e);
         }
     }
+
 
     public static String convertBitmapToBase64(Bitmap bitmap) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
